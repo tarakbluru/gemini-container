@@ -1,0 +1,13 @@
+services:
+  gemini-dev:
+    image: gemini-dev
+    volumes:
+      - ${WORKSPACE_DIR:-.}:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-}
+
+# To run: podman compose run gemini-dev
