@@ -1,4 +1,4 @@
-# PowerShell script to start Gemini container with current folder as project name
+# PowerShell script to start Gemini CLI container with current folder as project name
 # Place this script in your gemini_container directory
 # Run from any project directory
 
@@ -14,7 +14,7 @@ $envPath = Join-Path $scriptDir ".env"
 # Set environment variable for current directory to override the volume mapping
 $env:WORKSPACE_DIR = $currentPath
 
-Write-Host "🚀 Starting Gemini for project: $projectName" -ForegroundColor Green
+Write-Host "🚀 Starting Gemini CLI for project: $projectName" -ForegroundColor Green
 Write-Host "📁 Workspace: $currentPath" -ForegroundColor Cyan
 Write-Host "🐳 Using compose file: $dockerComposePath" -ForegroundColor Yellow
 
@@ -24,27 +24,13 @@ if (-not (Test-Path $dockerComposePath)) {
     exit 1
 }
 
-# Check if .env file exists
-if (-not (Test-Path $envPath)) {
-    Write-Host "⚠️  Warning: .env file not found at $envPath" -ForegroundColor Yellow
-    Write-Host "💡 Please create .env file with your GEMINI_API_KEY" -ForegroundColor Gray
-}
-
-# Load environment variables from .env file
+# Load environment variables from .env file if it exists
 if (Test-Path $envPath) {
     Get-Content $envPath | ForEach-Object {
         if ($_ -match "^([^#][^=]+)=(.*)$") {
             [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2], "Process")
         }
     }
-}
-
-# Check if GEMINI_API_KEY is set
-if (-not $env:GEMINI_API_KEY) {
-    Write-Host "❌ Error: GEMINI_API_KEY not set" -ForegroundColor Red
-    Write-Host "💡 Please set your Gemini API key in the .env file" -ForegroundColor Gray
-    Write-Host "💡 Get your key from: https://aistudio.google.com/app/apikey" -ForegroundColor Gray
-    exit 1
 }
 
 # Check if container is already running
@@ -70,9 +56,13 @@ if ($runningContainers) {
 # Execute bash in the container
 Write-Host "🖥️  Opening bash prompt..." -ForegroundColor Cyan
 Write-Host "📝 To exit, type 'exit' in the container" -ForegroundColor Gray
-Write-Host "🤖 Gemini CLI commands:" -ForegroundColor Gray
-Write-Host "   python -m google.generativeai.cli chat" -ForegroundColor Cyan
-Write-Host "   python -m google.generativeai.cli generate 'your prompt'" -ForegroundColor Cyan
+Write-Host "🤖 To start Gemini CLI, run: gemini" -ForegroundColor Gray
+Write-Host "💡 Gemini CLI features:" -ForegroundColor Gray
+Write-Host "   - Interactive chat mode" -ForegroundColor Cyan
+Write-Host "   - Code understanding and generation" -ForegroundColor Cyan
+Write-Host "   - Project-aware assistance" -ForegroundColor Cyan
+Write-Host "   - Built-in tools and web search" -ForegroundColor Cyan
+Write-Host "   - Free tier: 60 requests/min, 1000/day" -ForegroundColor Cyan
 Write-Host "───────────────────────────────────────────" -ForegroundColor Gray
 
 podman compose -p $projectName -f $dockerComposePath exec gemini-dev bash

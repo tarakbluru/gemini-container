@@ -3,11 +3,16 @@ services:
     image: gemini-dev
     volumes:
       - ${WORKSPACE_DIR:-.}:/workspace
+      # Mount home directory for Gemini CLI config persistence
+      - gemini-config:/root/.config
     working_dir: /workspace
     stdin_open: true
     tty: true
     environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-}
+
+volumes:
+  gemini-config:
 
 # To run: podman compose run gemini-dev
